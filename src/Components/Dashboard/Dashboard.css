@@ -75,3 +75,19 @@
   font-weight: bold;
   color: #0f172a;
 }
+
+table, th, td {
+      border: 2px solid black;
+      border-collapse: collapse;
+    }
+
+    table {
+      width: 70%;
+      margin: 20px auto;
+      text-align: center;
+    }
+
+    th {
+      padding: 10px;
+      background-color: #f2f2f2;
+    }
