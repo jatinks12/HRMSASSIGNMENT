@@ -28,10 +28,10 @@ const Management = () => {
       const {data,error} = await SupabaseClient.from("Employee").insert([
         formdata 
       ]);
-      if (data){
-        console.log("success", data)
-      }if(error){
-        console.log("error occured", error)
+      if (error){
+        console.log("error occured", error);
+      }else{
+        console.log("success", data);
       }
       console.log(formdata);
       setFormdata({
@@ -43,21 +43,22 @@ const Management = () => {
     }
   return (
    <form onSubmit={handleSubmit}>
+    <h1>Employees</h1>
     <label> Enter Your Name </label>
     <input type="text" name = "Name" placeholder="enter name"
      onChange={handleChange} value={formdata.Name}/>
-
+  <br/>
     <label>Enter Your Mail id. </label>
     <input type="text" name = "Email" placeholder="enter email"
     onChange={handleChange} value={formdata.Email} />
-    
+    <br/>
     <label>Enter Your Department</label>
     <input type="text" name = "department" placeholder="enter department" 
     onChange={handleChange} value={formdata.department}/>
-
+<br/>
     <label>Enter your Role</label>
     <input type="text" name="role" placeholder="enter role" 
-    onChange={handleChange} value={formdata.role}/>
+    onChange={handleChange} value={formdata.role}/><br/><br/>
   <button type="submit" >Submit</button>
    </form>
    
