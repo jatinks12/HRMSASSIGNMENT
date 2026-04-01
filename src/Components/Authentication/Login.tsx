@@ -1,7 +1,11 @@
 import { useFormik } from "formik";
 import styles from "./Login.module.css";
 import *as Yup from "yup"
+import { SupabaseClient } from "../../Helper/Supabase";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 const Login = () => {
+  const navigate= useNavigate();
   const formik = useFormik({
     initialValues: {
      
@@ -12,8 +16,24 @@ const Login = () => {
       email:Yup.string().email("Invalid email format (example:-> test@gmail.com").required("Email is required"),
       password:Yup.string().min(6,"password must be atleast 6 chracter").required("password is required")
     }),
-    onSubmit: (values) => {
-      console.log(values);
+    onSubmit: async(values) => {
+      try{
+        const{data,error} = await SupabaseClient.auth.signInWithPassword({
+          email:values.email,
+          password:values.password
+        });
+        if(error){
+          toast.error(error.message);
+        }else{
+          console.log("login success: " , data);
+          toast.success("Login successful!")
+          setTimeout(()=>{
+            navigate("/dashboard");
+          },500)
+        }
+      }catch(err){
+        console.error(err);
+      }
     },
   });
   return (
