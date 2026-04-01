@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import "./Dashboard.css"
 import { BarChart,Bar,XAxis,YAxis,Tooltip,CartesianGrid, PieChart, ResponsiveContainer, Pie,Cell } from "recharts";
 import { SupabaseClient } from "../../Helper/Supabase";
-import { values } from "mobx";
-import type { data } from "react-router-dom";
+
+
 
 
 const Dashboard = () => {
@@ -67,43 +67,39 @@ const Dashboard = () => {
 {/*Chart  */}
 <div className="allcharts">
 
-<div   id="Barchart" 
+  <div id="Barchart">
+    <ResponsiveContainer width="100%" height={300}>
+      <BarChart data={chartData}>
+        <CartesianGrid strokeDasharray="3 3"/>
+        <XAxis dataKey="name"/>
+        <YAxis/>
+        <Tooltip/>
+        <Bar dataKey="value" fill="red"/>
+      </BarChart>
+    </ResponsiveContainer>
+  </div>
 
-style={{width:"100%",height:300}}>
-<BarChart width={500}height={300}data={chartData}>
-<CartesianGrid  strokeDasharray="3 3"/>
-<XAxis dataKey="name"/>
-<YAxis/>
-<Tooltip/>
-<Bar dataKey="value" fill="red"/>
+  <div id="Piechart">
+     <ResponsiveContainer width="100%" height={300}>
+      <PieChart>
+        <Pie
+          data={chartData}
+          dataKey="value"
+          nameKey="name"
+          cx="50%"
+          cy="50%"
+          outerRadius={100}
+          label
+        >
+          <Cell fill="#0088FE" />
+          <Cell fill="#00C49F" />
+          <Cell fill="#FF8042" />
+        </Pie>
+        <Tooltip />
+      </PieChart>
+    </ResponsiveContainer>
+  </div>
 
-
-</BarChart>
-
-</div>
-
-
-<div id="Piechart">
-<ResponsiveContainer width="100%" height={300}>
-  <PieChart>
-    <Pie
-      data={chartData}
-      dataKey="value"
-      nameKey="name"
-      cx="50%"
-      cy="50%"
-      outerRadius={100}
-      label
-    >
-      <Cell fill="#0088FE" />
-  <Cell fill="#00C49F" />
-  <Cell fill="#FF8042" />
-    </Pie>
-
-    <Tooltip />
-  </PieChart>
-</ResponsiveContainer>
-</div>
 </div>
 
       {/* Table */}
