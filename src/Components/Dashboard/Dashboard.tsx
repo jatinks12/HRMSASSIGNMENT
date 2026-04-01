@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import "./Dashboard.css"
+import { BarChart,Bar,XAxis,YAxis,Tooltip,CartesianGrid } from "recharts";
 import { SupabaseClient } from "../../Helper/Supabase";
+import { values } from "mobx";
 
 
 const Dashboard = () => {
@@ -24,6 +26,14 @@ const Dashboard = () => {
     }
   }
 
+  const chartData=[
+    {name:"Employee",value:employees.length},
+    {name:"leaves",value:56},
+    {name:"pending",value:78}
+
+
+
+]
   return (
     <div className="dashboard">
 
@@ -44,6 +54,23 @@ const Dashboard = () => {
         </div>
 
       </div>
+
+{/*Chart  */}
+
+<div style={{width:"100%",height:300}}>
+<BarChart width={500}height={300}data={chartData}>
+<CartesianGrid  strokeDasharray="3 3"/>
+<XAxis dataKey="name"/>
+<YAxis/>
+<Tooltip/>
+<Bar dataKey="value" fill="blue"/>
+
+
+</BarChart>
+
+</div>
+
+
 
       {/* Table */}
       <table >
@@ -74,7 +101,7 @@ const Dashboard = () => {
   : (
     <tr>
       <td  style={{ textAlign: "center" }}>
-        No Data Found
+       
       </td>
     </tr>
   )}
@@ -84,5 +111,7 @@ const Dashboard = () => {
     </div>
   );
 };
+
+
 
 export default Dashboard;
