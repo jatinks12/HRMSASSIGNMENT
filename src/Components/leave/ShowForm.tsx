@@ -22,6 +22,7 @@ const ShowForm = () => {
     }),
     onSubmit: async(values) => {
       console.log(values);
+      console.log(values.name)
      
     },
   });
