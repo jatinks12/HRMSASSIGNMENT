@@ -94,3 +94,14 @@ table, th, td {
       padding: 10px;
       background-color: #f2f2f2;
     }
+   .allcharts {
+  display: flex;
+  gap: 20px;
+  flex-wrap: nowrap;   /* ek hi row me rakhega */
+}
+
+#Barchart,
+#Piechart {
+  width: 50%;
+  height: 300px;
+}
