@@ -1,4 +1,5 @@
-import React, { useState } from "react"
+import  { useState } from "react"
+import EmployeeTable from "./Table";
 import { SupabaseClient } from "../../Helper/Supabase";
 
 interface Idata {
@@ -14,6 +15,7 @@ const Management = () => {
     role: "",
     department: "",
   });
+  const [employees,setEmployee] = useState([]);
 
   const handleChange = (e:any)=> {
       const {name, value} = e.target;
@@ -34,6 +36,8 @@ const Management = () => {
         console.log("success", data);
       }
       console.log(formdata);
+
+    
       setFormdata({
         Name:"",
         Email:"",
@@ -41,7 +45,12 @@ const Management = () => {
         department:""
       })
     }
+      const deleteEmployee = (index:number) =>{
+        const updatedEmployees = employees.filter((_,i) => i !==index);
+        setEmployee(updatedEmployees);
+      }
   return (
+    <div>
    <form onSubmit={handleSubmit}>
     <h1>Employees</h1>
     <label> Enter Your Name </label>
@@ -60,8 +69,12 @@ const Management = () => {
     <input type="text" name="role" placeholder="enter role" 
     onChange={handleChange} value={formdata.role}/><br/><br/>
   <button type="submit" >Submit</button>
+  <br/>
    </form>
-   
+   <EmployeeTable
+   employees={employees}
+   deleteEmployee={deleteEmployee} />
+</div>
   )
 }
 
