@@ -1,8 +1,8 @@
 import React from "react";
 
 type Employees = {
-    name:string,
-    email:string,
+    Name:string,
+    Email:string,
     role: string,
     department: string
 };
@@ -31,8 +31,8 @@ const EmployeeTable: React.FC<Props> = ({employees,deleteEmployee}) => {
         <tbody>
             {employees.map((emp,index) =>(
                 <tr key = {index}>
-                    <td>{emp.name}</td>
-                    <td>{emp.email}</td>
+                    <td>{emp.Name}</td>
+                    <td>{emp.Email}</td>
                     <td>{emp.role}</td>
                     <td>{emp.department}</td>
                     <td>

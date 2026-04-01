@@ -1,8 +1,9 @@
-import  { useState } from "react"
+import  { useEffect, useState } from "react"
 import EmployeeTable from "./Table";
 import { SupabaseClient } from "../../Helper/Supabase";
 
 interface Idata {
+  
   Name: string,
     Email: string,
     role: string,
@@ -10,12 +11,24 @@ interface Idata {
 };
 const Management = () => {
   const[formdata, setFormdata] =useState<Idata>({
+    
     Name: "",
     Email: "",
     role: "",
     department: "",
   });
-  const [employees,setEmployee] = useState([]);
+  const [employees,setEmployee] = useState<any[]>([]);
+
+  async function  fetchData() {
+    const {data,error} =await SupabaseClient.from("Employee").select("*");
+    if(data){
+      setEmployee(data);
+    }else{
+       console.log("error occured", error);
+    }
+  }
+
+  useEffect(()=>{fetchData()},[])
 
   const handleChange = (e:any)=> {
       const {name, value} = e.target;
@@ -39,16 +52,34 @@ const Management = () => {
 
     
       setFormdata({
+        
         Name:"",
         Email:"",
         role:"",
-        department:""
+        department:"",
       })
     }
-      const deleteEmployee = (index:number) =>{
-        const updatedEmployees = employees.filter((_,i) => i !==index);
-        setEmployee(updatedEmployees);
-      }
+      const deleteEmployee = async (id: number) => {
+
+  const deleteEmployee = async (id: number) => {
+
+  if (!window.confirm("Are you sure you want to delete this employee?")) {
+    return;
+  }
+
+  const { error } = await SupabaseClient
+    .from("Employee")
+    .delete()
+    .eq("id", id);
+
+  if (error) {
+    console.log("Delete error:", error);
+    return;
+  }
+
+  fetchData();
+};
+};
   return (
     <div>
    <form onSubmit={handleSubmit}>
