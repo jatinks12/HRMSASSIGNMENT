@@ -33,8 +33,8 @@ const Dashboard = () => {
 
   const chartData = [
   { name: "Employees", value: employees.length },
-  { name: "Leaves", value: employees.filter(emp => emp.leave === true).length },
-  { name: "Pending", value: employees.filter(emp => emp.status === "pending").length },
+  { name: "Leaves", value: employees.filter(emp => emp.Status === false).length },
+  { name: "Pending", value: employees.filter(emp => emp.Status === true && emp.Pending===true).length },
 ];
 
 
@@ -53,11 +53,13 @@ const Dashboard = () => {
         </div>
 
         <div className="card">
-          <h3>Leaves</h3>
+          <h3>Leave</h3>
+          <p>{chartData[1].value}</p>
         </div>
 
         <div className="card">
           <h3>Pending Requests</h3>
+          <p>{chartData[2].value}</p>
         </div>
 
       </div>
