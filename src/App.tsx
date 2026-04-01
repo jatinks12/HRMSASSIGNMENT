@@ -3,6 +3,8 @@ import Dashboard from "./Components/Dashboard/Dashboard"
 import Leave from "./Components/leave/Leave"
 import Management from "./Components/Management/Management"
 import './App.css'
+import Login from "./Components/Authentication/Login"
+import SignUp from "./Components/Authentication/SignUp"
 
 const App = () => {
  
@@ -18,6 +20,8 @@ const App = () => {
       </nav>
     </header>
    <Routes>
+    <Route path="/login" element={<Login/>}/>
+    <Route path="/Signup" element={<SignUp/>}/>
     <Route path="/" element={<Dashboard/>}/>
     <Route path="/leave" element={<Leave/>}/>
     <Route path="/management" element={<Management/>}/>
