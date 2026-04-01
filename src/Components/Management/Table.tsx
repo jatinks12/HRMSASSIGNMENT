@@ -33,11 +33,11 @@ const EmployeeTable: React.FC<Props> = ({employees,deleteEmployee}) => {
                 <tr key = {index}>
                     <td>{emp.Name}</td>
                     <td>{emp.Email}</td>
-                    <td>{emp.role}</td>
                     <td>{emp.department}</td>
+                    <td>{emp.role}</td>
                     <td>
                         <button>Edit</button>
-                        <button onClick={()=>deleteEmployee(index)}>Delete</button>
+                        <button onClick={()=>deleteEmployee(emp.Email)}>Delete</button>
                     </td>
                 </tr>
             ))}

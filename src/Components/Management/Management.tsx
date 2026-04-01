@@ -1,6 +1,7 @@
 import  { useEffect, useState } from "react"
 import EmployeeTable from "./Table";
 import { SupabaseClient } from "../../Helper/Supabase";
+import toast from "react-hot-toast";
 
 interface Idata {
   
@@ -40,6 +41,10 @@ const Management = () => {
 
     const handleSubmit = async(e:any) =>{
       e.preventDefault(); 
+      if(formdata.Name==="" || formdata.Email==="" || formdata.department==="" || formdata.role === ""){
+        toast.error("please fill all credentials");
+        return;
+      }
       const {data,error} = await SupabaseClient.from("Employee").insert([
         formdata 
       ]);
@@ -47,6 +52,7 @@ const Management = () => {
         console.log("error occured", error);
       }else{
         console.log("success", data);
+        fetchData();
       }
       console.log(formdata);
 
@@ -59,48 +65,58 @@ const Management = () => {
         department:"",
       })
     }
-      const deleteEmployee = async (id: number) => {
-
-  const deleteEmployee = async (id: number) => {
-
-  if (!window.confirm("Are you sure you want to delete this employee?")) {
-    return;
-  }
+   const deleteEmployee = async (email: string) => {
 
   const { error } = await SupabaseClient
     .from("Employee")
     .delete()
-    .eq("id", id);
+    .eq("Email", email);
 
   if (error) {
     console.log("Delete error:", error);
-    return;
+  } else {
+    console.log("Employee deleted");
+    fetchData();
   }
+};
 
-  fetchData();
-};
-};
+  
+
   return (
     <div>
    <form onSubmit={handleSubmit}>
     <h1>Employees</h1>
     <label> Enter Your Name </label>
     <input type="text" name = "Name" placeholder="enter name"
-     onChange={handleChange} value={formdata.Name}/>
+     onChange={handleChange} value={formdata.Name} required/>
   <br/>
     <label>Enter Your Mail id. </label>
-    <input type="text" name = "Email" placeholder="enter email"
-    onChange={handleChange} value={formdata.Email} />
+    <input type="email" name = "Email" placeholder="enter email"
+    onChange={handleChange} value={formdata.Email} required/>
     <br/>
-    <label>Enter Your Department</label>
-    <input type="text" name = "department" placeholder="enter department" 
-    onChange={handleChange} value={formdata.department}/>
+    <label>Enter Your Department </label>
+    <select  name = "department" 
+    onChange={handleChange} value={formdata.department} required> 
+    <option value=""> Select department </option>
+    <option value="HR">HR</option>
+    <option value="IT">IT</option>
+    <option value="Finance">Finance</option>
+    <option value="Marketing">Marketing</option>
+    <option value = "intern">Intern</option>
+    </select>
 <br/>
     <label>Enter your Role</label>
-    <input type="text" name="role" placeholder="enter role" 
-    onChange={handleChange} value={formdata.role}/><br/><br/>
-  <button type="submit" >Submit</button>
+    <select name="role" 
+    onChange={handleChange} value={formdata.role} required> <br/><br/>
+  <option value =""> Select role </option>
+  <option value = "manager">manager</option>
+  <option value = "designer">Designer</option>
+  <option value = "developer">Developer</option>
+  <option value="intern">Intern</option>
+  </select>
   <br/>
+    <button type="submit" >Submit</button>
+
    </form>
    <EmployeeTable
    employees={employees}
