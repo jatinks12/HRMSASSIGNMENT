@@ -1,8 +1,8 @@
 import React from "react";
 
 type Employees = {
-    name:string,
-    email:string,
+    Name:string,
+    Email:string,
     role: string,
     department: string
 };
@@ -10,13 +10,14 @@ type Employees = {
 type Props= {
     employees: Employees[];
     deleteEmployee:(index:any) => void;
+    editEmployee:(emp:Employees) =>void;
 };
 
-const EmployeeTable: React.FC<Props> = ({employees,deleteEmployee}) => {
+const EmployeeTable: React.FC<Props> = ({employees,deleteEmployee,editEmployee}) => {
     return(
         <div>
             <h1>Employee Table</h1>
-           
+          
             <table border={1}>
                 <thead>
                 <tr>
@@ -31,19 +32,22 @@ const EmployeeTable: React.FC<Props> = ({employees,deleteEmployee}) => {
         <tbody>
             {employees.map((emp,index) =>(
                 <tr key = {index}>
-                    <td>{emp.name}</td>
-                    <td>{emp.email}</td>
-                    <td>{emp.role}</td>
+                    <td>{emp.Name}</td>
+                    <td>{emp.Email}</td>
                     <td>{emp.department}</td>
+                    <td>{emp.role}</td>
                     <td>
-                        <button>Edit</button>
-                        <button onClick={()=>deleteEmployee(index)}>Delete</button>
+                        <button onClick={() =>editEmployee(emp)} >Edit</button>
+
+                        <button onClick={()=>deleteEmployee(emp.Email)}>Delete</button>
                     </td>
                 </tr>
             ))}
         </tbody>
             </table>
+            <><h2>Total Employees : {employees.length}</h2></>
         </div>
+        
     )
 };
 export default EmployeeTable;
