@@ -18,6 +18,8 @@ const Management = () => {
     role: "",
     department: "",
   });
+
+  //Getting data from supabase
   const [employees,setEmployee] = useState<any[]>([]);
 
   async function  fetchData() {
@@ -28,7 +30,6 @@ const Management = () => {
        console.log("error occured", error);
     }
   }
-
   useEffect(()=>{fetchData()},[])
 
   const handleChange = (e:any)=> {
@@ -45,26 +46,53 @@ const Management = () => {
         toast.error("please fill all credentials");
         return;
       }
+      //Update data 
+      if(editEmail){
+        const {error} = await SupabaseClient 
+        .from ("Employee")
+        .update(formdata)
+        .eq("Email", editEmail);
+
+        if(error){
+          console.log("error occur")}
+        else{
+          toast.success("Employee Updated");
+          fetchData();
+          setEditEmail(null);
+        }
+      }
+      //insert data in supabase
+      if(editEmail){
       const {data,error} = await SupabaseClient.from("Employee").insert([
         formdata 
       ]);
       if (error){
-        console.log("error occured", error);
+        console.log("error in updation", error);
       }else{
         console.log("success", data);
         fetchData();
       }
-      console.log(formdata);
-
-    
-      setFormdata({
-        
+    }
+    else{
+      const {data,error} = await SupabaseClient
+      .from("Employee")
+      .insert([formdata]);
+      if(error){
+        console.log("Error occur");
+      }
+      else{
+        toast.success("New Employee Added");
+        fetchData()
+      }
+    }
+    //delete function
+      setFormdata({ 
         Name:"",
         Email:"",
         role:"",
         department:"",
-      })
-    }
+      });
+    };
    const deleteEmployee = async (email: string) => {
 
   const { error } = await SupabaseClient
@@ -76,12 +104,17 @@ const Management = () => {
     console.log("Delete error:", error);
   } else {
     console.log("Employee deleted");
+    toast.success(" Employee Deleted");
     fetchData();
   }
 };
-
-  
-
+// Edit function
+  const [editEmail,setEditEmail]= useState<string | null>(null);
+   const editEmployee = (emp:Idata) =>{
+   setFormdata(emp);
+   setEditEmail(emp.Email);
+   }
+ //Form
   return (
     <div>
    <form onSubmit={handleSubmit}>
@@ -105,7 +138,7 @@ const Management = () => {
     <option value = "intern">Intern</option>
     </select>
 <br/>
-    <label>Enter your Role</label>
+    <label>Enter your Role </label>
     <select name="role" 
     onChange={handleChange} value={formdata.role} required> <br/><br/>
   <option value =""> Select role </option>
@@ -116,11 +149,14 @@ const Management = () => {
   </select>
   <br/>
     <button type="submit" >Submit</button>
-
+{/* <button type="submit">
+  {editEmail ? "Update" : "Submit"}
+</button> */}
    </form>
    <EmployeeTable
    employees={employees}
-   deleteEmployee={deleteEmployee} />
+   deleteEmployee={deleteEmployee} 
+   editEmployee={editEmployee}/>
 </div>
   )
 }
