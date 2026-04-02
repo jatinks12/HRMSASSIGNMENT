@@ -1,7 +1,8 @@
 import  { useEffect, useState } from "react"
 import EmployeeTable from "./Table";
 import { SupabaseClient } from "../../Helper/Supabase";
-
+import toast from "react-hot-toast"
+ import "./Management.css";
 interface Idata {
   
   Name: string,
@@ -17,6 +18,8 @@ const Management = () => {
     role: "",
     department: "",
   });
+
+  //Getting data from supabase
   const [employees,setEmployee] = useState<any[]>([]);
 
   async function  fetchData() {
@@ -27,7 +30,6 @@ const Management = () => {
        console.log("error occured", error);
     }
   }
-
   useEffect(()=>{fetchData()},[])
 
   const handleChange = (e:any)=> {
@@ -40,73 +42,132 @@ const Management = () => {
 
     const handleSubmit = async(e:any) =>{
       e.preventDefault(); 
+      if(formdata.Name==="" || formdata.Email==="" || formdata.department==="" || formdata.role === ""){
+        toast.error("please fill all credentials");
+        return;
+      }
+      //Update data 
+      if(editEmail){
+        const {error} = await SupabaseClient 
+        .from ("Employee")
+        .update(formdata)
+        .eq("Email", editEmail);
+
+        if(error){
+          console.log("error occur")}
+        else{
+          toast.success("Employee Updated");
+          fetchData();
+          setEditEmail(null);
+        }
+      }
+      //insert data in supabase
+      if(editEmail){
       const {data,error} = await SupabaseClient.from("Employee").insert([
         formdata 
       ]);
       if (error){
-        console.log("error occured", error);
+        console.log("error in updation", error);
       }else{
         console.log("success", data);
+        fetchData();
       }
-      console.log(formdata);
-
-    
-      setFormdata({
-        
+    }
+    else{
+      const {data,error} = await SupabaseClient
+      .from("Employee")
+      .insert([formdata]);
+      if(error){
+        console.log("Error occur");
+      }
+      else{
+        toast.success("New Employee Added");
+        fetchData()
+      }
+    }
+    //delete function
+      setFormdata({ 
         Name:"",
         Email:"",
         role:"",
         department:"",
-      })
-    }
-      const deleteEmployee = async (id: number) => {
-
-  const deleteEmployee = async (id: number) => {
-
-  if (!window.confirm("Are you sure you want to delete this employee?")) {
-    return;
-  }
+      });
+    };
+   const deleteEmployee = async (email: string) => {
 
   const { error } = await SupabaseClient
     .from("Employee")
     .delete()
-    .eq("id", id);
+    .eq("Email", email);
 
   if (error) {
     console.log("Delete error:", error);
-    return;
+  } else {
+    console.log("Employee deleted");
+    toast.success(" Employee Deleted");
+    fetchData();
   }
-
-  fetchData();
 };
-};
+// Edit function
+  const [editEmail,setEditEmail]= useState<string | null>(null);
+   const editEmployee = (emp:Idata) =>{
+   setFormdata(emp);
+   setEditEmail(emp.Email);
+   }
+ //Form
   return (
-    <div>
+    <div className="container">
+      <h1>Employees Management</h1>
+
    <form onSubmit={handleSubmit}>
-    <h1>Employees</h1>
+    
     <label> Enter Your Name </label>
     <input type="text" name = "Name" placeholder="enter name"
-     onChange={handleChange} value={formdata.Name}/>
+     onChange={handleChange} value={formdata.Name} required/>
   <br/>
     <label>Enter Your Mail id. </label>
-    <input type="text" name = "Email" placeholder="enter email"
-    onChange={handleChange} value={formdata.Email} />
+    <input type="email" name = "Email" placeholder="enter email"
+    onChange={handleChange} value={formdata.Email} required/>
     <br/>
-    <label>Enter Your Department</label>
-    <input type="text" name = "department" placeholder="enter department" 
-    onChange={handleChange} value={formdata.department}/>
+    <label>Enter Your Department </label>
+    <select  name = "department" 
+    onChange={handleChange} value={formdata.department} required> 
+    <option value=""> Select department </option>
+    <option value="techOps">techOps</option>
+    <option value="NetInfa">NetInfa</option>
+    <option value="AppDev">AppDev</option>
+    <option value="DevOps">DevOps</option>
+    <option value = "CloudSVc">CloudSVc</option>
+    <option value = "ITStrac">ITStrac</option>
+    <option value = "DigSol">DigSol</option>
+    <option value = "CSE">CSE</option>
+    <option value = "DataLab">DataLab</option>
+    </select>
 <br/>
-    <label>Enter your Role</label>
-    <input type="text" name="role" placeholder="enter role" 
-    onChange={handleChange} value={formdata.role}/><br/><br/>
-  <button type="submit" >Submit</button>
+    <label>Enter your Role </label>
+    <select name="role" 
+    onChange={handleChange} value={formdata.role} required> <br/><br/>
+  <option value =""> Select role </option>
+  <option value = "Software Developer">Software Developer</option>
+  <option value = "Full Stack">Full Stack</option>
+  <option value = "DevOps">DevOps</option>
+  <option value="Project Manager">Project Manager</option>
+  <option value="Technical suppoter">Technical suppoter</option>
+  <option value="Business analyst">Business analyst</option>
+  <option value="Frontend developer">Frontend developer</option>
+  <option value="UI designer">UI designer</option>
+  </select>
   <br/>
+    <button type="submit" >Submit</button>
+
    </form>
+ 
    <EmployeeTable
    employees={employees}
-   deleteEmployee={deleteEmployee} />
+   deleteEmployee={deleteEmployee} 
+   editEmployee={editEmployee}/>
 </div>
+
   )
 }
-
-export default Management
+export default Management;
