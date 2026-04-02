@@ -3,8 +3,13 @@ import styles from "./Login.module.css";
 import *as Yup from "yup"
 import { SupabaseClient } from "../../Helper/Supabase";
 import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
-const Login = () => {
+import { Link, useNavigate } from "react-router-dom";
+import { applyRolePermissions } from "../../Helper/roles";
+const Admin1 ="4b1ce711-a68a-4571-bf4e-07c2e798cb57";
+const Admin2 ="e27b7ccd-999e-4769-a84e-eaa58ce5a37e";
+const Admin3 ="b09ecf30-7635-4b7a-803a-0555a34db13e";
+
+const Login = ({setCheckDashboard ,setCheckleave, setCheckmanagement, setUserId}:any) => {
   const navigate= useNavigate();
   const formik = useFormik({
     initialValues: {
@@ -25,11 +30,27 @@ const Login = () => {
         if(error){
           toast.error(error.message);
         }else{
-          console.log("login success: " , data);
           toast.success("Login successful!")
-          setTimeout(()=>{
-            navigate("/dashboard");
-          },500)
+          setTimeout(() => {
+            const userId = data.user.id;
+
+            applyRolePermissions({
+              userId,
+              setCheckDashboard,
+              setCheckleave,
+              setCheckmanagement,
+              setUserId,
+            });
+
+            
+            const routeMap: Record<string, string> = {
+              "4b1ce711-a68a-4571-bf4e-07c2e798cb57": "/dashboard",
+              "e27b7ccd-999e-4769-a84e-eaa58ce5a37e": "/management",
+              "b09ecf30-7635-4b7a-803a-0555a34db13e": "/dashboard",
+            };
+
+            navigate(routeMap[userId] ?? "/leave");
+          }, 500);
         }
       }catch(err){
         console.error(err);
@@ -66,6 +87,8 @@ const Login = () => {
         ></input>
          {formik.touched.password && formik.errors.password &&<div className={styles.error}>{formik.errors.password}</div>}
         <button type="submit" className={styles.button}>Submit</button>
+
+        <p> Don't have Account? <Link to="/signup">SignUp</Link></p>
       </form>
     </div>
   );
