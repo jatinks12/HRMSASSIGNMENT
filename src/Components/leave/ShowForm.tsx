@@ -22,8 +22,10 @@ const ShowForm = () => {
     }),
     onSubmit: async(values) => {
       console.log(values);
-      console.log(values.name)
-     
+      formik.values.name="";
+      formik.values.startDate="";
+      formik.values.endDate="";
+      formik.values.reason="";
     },
   });
 

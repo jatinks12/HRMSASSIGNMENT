@@ -3,8 +3,12 @@ import styles from "./Login.module.css";
 import *as Yup from "yup"
 import { SupabaseClient } from "../../Helper/Supabase";
 import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
-const Login = () => {
+import { Link, useNavigate } from "react-router-dom";
+const Admin1 ="4b1ce711-a68a-4571-bf4e-07c2e798cb57";
+const Admin2 ="e27b7ccd-999e-4769-a84e-eaa58ce5a37e";
+const Admin3 ="b09ecf30-7635-4b7a-803a-0555a34db13e";
+
+const Login = ({setCheckDashboard ,setCheckleave, setCheckmanagement}:any) => {
   const navigate= useNavigate();
   const formik = useFormik({
     initialValues: {
@@ -25,10 +29,33 @@ const Login = () => {
         if(error){
           toast.error(error.message);
         }else{
-          console.log("login success: " , data);
           toast.success("Login successful!")
-          setTimeout(()=>{
-            navigate("/dashboard");
+          setTimeout(async()=>{
+            if(data.user.id === Admin1){
+              setCheckDashboard(true);
+              setCheckleave(true);
+              setCheckmanagement(true);
+              navigate("/dashboard"); 
+            }
+            else if(data.user.id === Admin2){
+              setCheckDashboard(false);
+              setCheckleave(false);
+              setCheckmanagement(true);
+              navigate("/management"); 
+            }
+            else if(data.user.id === Admin3){
+              setCheckDashboard(true);
+              setCheckleave(false);
+              setCheckmanagement(false);
+              navigate("/dashboard"); 
+               
+            }
+            else{
+               setCheckDashboard(false);
+              setCheckleave(true);
+              setCheckmanagement(false);
+              navigate("/leave"); 
+            }
           },500)
         }
       }catch(err){
@@ -66,6 +93,8 @@ const Login = () => {
         ></input>
          {formik.touched.password && formik.errors.password &&<div className={styles.error}>{formik.errors.password}</div>}
         <button type="submit" className={styles.button}>Submit</button>
+
+        <p> Don't have Account? <Link to="/signup">SignUp</Link></p>
       </form>
     </div>
   );
