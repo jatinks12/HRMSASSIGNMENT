@@ -17,7 +17,7 @@ const EmployeeTable: React.FC<Props> = ({employees,deleteEmployee,editEmployee})
     return(
         <div>
             <h1>Employee Table</h1>
-           
+          
             <table border={1}>
                 <thead>
                 <tr>
@@ -45,7 +45,9 @@ const EmployeeTable: React.FC<Props> = ({employees,deleteEmployee,editEmployee})
             ))}
         </tbody>
             </table>
+            <><h2>Total Employees : {employees.length}</h2></>
         </div>
+        
     )
 };
 export default EmployeeTable;

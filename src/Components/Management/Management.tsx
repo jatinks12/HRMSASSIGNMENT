@@ -1,8 +1,8 @@
 import  { useEffect, useState } from "react"
 import EmployeeTable from "./Table";
 import { SupabaseClient } from "../../Helper/Supabase";
-import toast from "react-hot-toast";
-
+import toast from "react-hot-toast"
+ import "./Management.css";
 interface Idata {
   
   Name: string,
@@ -116,9 +116,11 @@ const Management = () => {
    }
  //Form
   return (
-    <div>
+    <div className="container">
+      <h1>Employees Management</h1>
+
    <form onSubmit={handleSubmit}>
-    <h1>Employees</h1>
+    
     <label> Enter Your Name </label>
     <input type="text" name = "Name" placeholder="enter name"
      onChange={handleChange} value={formdata.Name} required/>
@@ -131,34 +133,41 @@ const Management = () => {
     <select  name = "department" 
     onChange={handleChange} value={formdata.department} required> 
     <option value=""> Select department </option>
-    <option value="HR">HR</option>
-    <option value="IT">IT</option>
-    <option value="Finance">Finance</option>
-    <option value="Marketing">Marketing</option>
-    <option value = "intern">Intern</option>
+    <option value="techOps">techOps</option>
+    <option value="NetInfa">NetInfa</option>
+    <option value="AppDev">AppDev</option>
+    <option value="DevOps">DevOps</option>
+    <option value = "CloudSVc">CloudSVc</option>
+    <option value = "ITStrac">ITStrac</option>
+    <option value = "DigSol">DigSol</option>
+    <option value = "CSE">CSE</option>
+    <option value = "DataLab">DataLab</option>
     </select>
 <br/>
     <label>Enter your Role </label>
     <select name="role" 
     onChange={handleChange} value={formdata.role} required> <br/><br/>
   <option value =""> Select role </option>
-  <option value = "manager">manager</option>
-  <option value = "designer">Designer</option>
-  <option value = "developer">Developer</option>
-  <option value="intern">Intern</option>
+  <option value = "Software Developer">Software Developer</option>
+  <option value = "Full Stack">Full Stack</option>
+  <option value = "DevOps">DevOps</option>
+  <option value="Project Manager">Project Manager</option>
+  <option value="Technical suppoter">Technical suppoter</option>
+  <option value="Business analyst">Business analyst</option>
+  <option value="Frontend developer">Frontend developer</option>
+  <option value="UI designer">UI designer</option>
   </select>
   <br/>
     <button type="submit" >Submit</button>
-{/* <button type="submit">
-  {editEmail ? "Update" : "Submit"}
-</button> */}
+
    </form>
+ 
    <EmployeeTable
    employees={employees}
    deleteEmployee={deleteEmployee} 
    editEmployee={editEmployee}/>
 </div>
+
   )
 }
-
-export default Management
+export default Management;
