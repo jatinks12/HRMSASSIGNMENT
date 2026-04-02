@@ -4,11 +4,12 @@ import *as Yup from "yup"
 import { SupabaseClient } from "../../Helper/Supabase";
 import toast from "react-hot-toast";
 import { Link, useNavigate } from "react-router-dom";
+import { applyRolePermissions } from "../../Helper/roles";
 const Admin1 ="4b1ce711-a68a-4571-bf4e-07c2e798cb57";
 const Admin2 ="e27b7ccd-999e-4769-a84e-eaa58ce5a37e";
 const Admin3 ="b09ecf30-7635-4b7a-803a-0555a34db13e";
 
-const Login = ({setCheckDashboard ,setCheckleave, setCheckmanagement}:any) => {
+const Login = ({setCheckDashboard ,setCheckleave, setCheckmanagement, setUserId}:any) => {
   const navigate= useNavigate();
   const formik = useFormik({
     initialValues: {
@@ -30,33 +31,26 @@ const Login = ({setCheckDashboard ,setCheckleave, setCheckmanagement}:any) => {
           toast.error(error.message);
         }else{
           toast.success("Login successful!")
-          setTimeout(async()=>{
-            if(data.user.id === Admin1){
-              setCheckDashboard(true);
-              setCheckleave(true);
-              setCheckmanagement(true);
-              navigate("/dashboard"); 
-            }
-            else if(data.user.id === Admin2){
-              setCheckDashboard(false);
-              setCheckleave(false);
-              setCheckmanagement(true);
-              navigate("/management"); 
-            }
-            else if(data.user.id === Admin3){
-              setCheckDashboard(true);
-              setCheckleave(false);
-              setCheckmanagement(false);
-              navigate("/dashboard"); 
-               
-            }
-            else{
-               setCheckDashboard(false);
-              setCheckleave(true);
-              setCheckmanagement(false);
-              navigate("/leave"); 
-            }
-          },500)
+          setTimeout(() => {
+            const userId = data.user.id;
+
+            applyRolePermissions({
+              userId,
+              setCheckDashboard,
+              setCheckleave,
+              setCheckmanagement,
+              setUserId,
+            });
+
+            
+            const routeMap: Record<string, string> = {
+              "4b1ce711-a68a-4571-bf4e-07c2e798cb57": "/dashboard",
+              "e27b7ccd-999e-4769-a84e-eaa58ce5a37e": "/management",
+              "b09ecf30-7635-4b7a-803a-0555a34db13e": "/dashboard",
+            };
+
+            navigate(routeMap[userId] ?? "/leave");
+          }, 500);
         }
       }catch(err){
         console.error(err);

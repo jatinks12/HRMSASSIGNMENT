@@ -19,7 +19,7 @@ const SignUp = () => {
     }),
     onSubmit: async (values) => {
       try {
-        const { data, error } = await SupabaseClient.auth.signUp({
+        const {  error } = await SupabaseClient.auth.signUp({
           email: values.email,
           password: values.password,
         });
