@@ -46,11 +46,19 @@ const Management = () => {
         toast.error("please fill all credentials");
         return;
       }
+
+
+       const formattedData = {
+    ...formdata,
+    Name: formdata.Name.toUpperCase(),
+    Email: formdata.Email.toUpperCase(),
+      };
+
       //Update data 
       if(editEmail){
         const {error} = await SupabaseClient 
         .from ("Employee")
-        .update(formdata)
+        .update(formattedData)
         .eq("Email", editEmail);
 
         if(error){
@@ -74,9 +82,9 @@ const Management = () => {
       }
     }
     else{
-      const {data,error} = await SupabaseClient
+      const {error} = await SupabaseClient
       .from("Employee")
-      .insert([formdata]);
+      .insert([formattedData]);
       if(error){
         console.log("Error occur");
       }
@@ -152,7 +160,7 @@ const Management = () => {
   <option value = "Full Stack">Full Stack</option>
   <option value = "DevOps">DevOps</option>
   <option value="Project Manager">Project Manager</option>
-  <option value="Technical suppoter">Technical suppoter</option>
+  <option value="Technical supporter">Technical supporter</option>
   <option value="Business analyst">Business analyst</option>
   <option value="Frontend developer">Frontend developer</option>
   <option value="UI designer">UI designer</option>
