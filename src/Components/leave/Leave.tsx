@@ -14,10 +14,10 @@ const Leave = ({userId}:any) => {
   }
   const [datas , setData] = useState<any[]>([]);
   useEffect(
-    ()=>{fetchData()},[]
+    ()=>{fetchData()},[datas]
   )
   async function fetchData(){
-  const {data, error}= await SupabaseClient.from("Employee").select("*");
+  const {data, error}= await SupabaseClient.from("Employee").select("*").eq("Status",true).eq("Pending",true);
 
   if(error){
     alert("unable to load employee data form the table")
@@ -27,8 +27,8 @@ const Leave = ({userId}:any) => {
  }
   return (
     <>
-  { showAdminPage && !FormStore.formStatus &&<button onClick={()=>FormStore.setFormStatus()}>ADD Leave request</button>  }
-  { showAdminPage && FormStore.formStatus &&<ShowForm  showAdminPage ={showAdminPage}/> }
+  {/* { showAdminPage && !FormStore.formStatus &&<button onClick={()=>FormStore.setFormStatus()}>ADD Leave request</button>  } */}
+  {/* { showAdminPage && FormStore.formStatus &&<ShowForm  showAdminPage ={showAdminPage}/> } */}
   {showAdminPage && !FormStore.formStatus && <ShowTable datas={datas}/>}
   {!showAdminPage && <ShowForm  showAdminPage ={showAdminPage}/>}
     </>
