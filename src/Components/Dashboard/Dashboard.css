@@ -1,80 +1,104 @@
+/* Page background (same as your form page) */
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background-color: #f4f6f9;
+}
+
+/* Main dashboard container */
 .dashboard {
-  padding: 20px 40px;
-  background: linear-gradient(135deg, #eef2f7, #f8fafc);
-  min-height: 100vh;
-  font-family: "Poppins", sans-serif;
+  width: 80%;
+  margin: auto;
+  padding: 20px;
 }
 
-/* Cards */
-.dashboard .cards-container {
+/* Cards container */
+.cards-container {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 30px;
+  gap: 20px;
+}
+
+/* Individual card */
+.card {
+  flex: 1;
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+  box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.1);
+}
+
+.card h3 {
+  color: #4CAF50;
+  margin-bottom: 10px;
+}
+
+.card p {
+  font-size: 22px;
+  font-weight: bold;
+  color: #333;
+}
+
+/* Charts section */
+.allcharts {
   display: flex;
   gap: 20px;
   margin-bottom: 30px;
-  flex-wrap: wrap;
 }
 
-.dashboard .card {
+#Barchart,
+#Piechart {
   flex: 1;
-  min-width: 220px;
-  background: #fff;
-  padding: 20px;
-  border-radius: 16px;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0px 3px 10px rgba(0,0,0,0.1);
 }
 
-.dashboard .card h3 {
-  font-size: 16px;
-  color: #6b7280;
-}
-
-.dashboard .card p {
-  font-size: 28px;
-  font-weight: 600;
-}
-
-/* Charts */
-.dashboard .allcharts {
-  display: flex;
-  gap: 20px;
-  flex-wrap: wrap;
-  margin-bottom: 30px;
-}
-
-.dashboard #Barchart,
-.dashboard #Piechart {
-  flex: 1;
-  min-width: 300px;
-  background: #fff;
-  padding: 20px;
-  border-radius: 16px;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.06);
-}
-
-/* Table */
-.dashboard table {
+/* Table styling (same as your given CSS) */
+table {
   width: 100%;
   border-collapse: collapse;
-  background: #fff;
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+  background: white;
+  margin-top: 20px;
+  box-shadow: 0px 3px 10px rgba(0,0,0,0.1);
 }
 
-.dashboard thead {
-  background: #4f46e5;
+/* Header */
+th {
+  background-color: #4CAF50;
   color: white;
+  padding: 10px;
 }
 
-.dashboard th {
-  padding: 15px;
-  text-align: left;
+/* Table cells */
+td {
+  padding: 10px;
+  text-align: center;
+  border-bottom: 1px solid #ddd;
 }
 
-.dashboard td {
-  padding: 14px;
-  border-bottom: 1px solid #eee;
+/* Hover effect */
+tr:hover {
+  background-color: #f1f1f1;
 }
 
-.dashboard tr:hover {
-  background: #f9fafb;
+/* Dropdown inside table */
+th select {
+  margin-top: 5px;
+  padding: 5px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+/* Responsive (important 🔥) */
+@media (max-width: 768px) {
+  .cards-container {
+    flex-direction: column;
+  }
+
+  .allcharts {
+    flex-direction: column;
+  }
 }
