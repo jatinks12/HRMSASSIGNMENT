@@ -2,7 +2,7 @@ import { useFormik } from "formik";
 import *as Yup from "yup"
 import styles from "./Signup.module.css";
 import { SupabaseClient } from "../../Helper/Supabase";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 const SignUp = () => {
   const navigate=useNavigate();
@@ -19,7 +19,7 @@ const SignUp = () => {
     }),
     onSubmit: async (values) => {
       try {
-        const { data, error } = await SupabaseClient.auth.signUp({
+        const {  error } = await SupabaseClient.auth.signUp({
           email: values.email,
           password: values.password,
         });
@@ -80,6 +80,9 @@ const SignUp = () => {
         {formik.touched.password && formik.errors.password && (<div className={styles.error}>{formik.errors.password}</div>)}
 
         <button type="submit" className={styles.button}>Submit</button>
+
+        <p> Already have Account? <Link to="/login">SignIn</Link></p>
+
       </form>
     </div>
   );

@@ -4,9 +4,8 @@ import { observer } from "mobx-react-lite";
 import FormStore from "./formstore";
 import styles from "./ShowForm.module.css";
 import *as Yup from "yup"
-import { SupabaseClient } from "../../Helper/Supabase";
 
-const ShowForm = () => {
+const ShowForm = ({showAdminPage}:any) => {
   const formik = useFormik({
     initialValues: {
       name: "",
@@ -22,7 +21,10 @@ const ShowForm = () => {
     }),
     onSubmit: async(values) => {
       console.log(values);
-     
+      formik.values.name="";
+      formik.values.startDate="";
+      formik.values.endDate="";
+      formik.values.reason="";
     },
   });
 
@@ -30,9 +32,10 @@ const ShowForm = () => {
     <form onSubmit={formik.handleSubmit} className={styles.form}>
       <div className={styles.header}>
         <span>Personal information </span>
-        <button type="button" onClick={() => FormStore.handleFormCancel()} className={styles.cancelBtn}>
+        {console.log(showAdminPage)}
+        {showAdminPage && <button type="button" onClick={() => FormStore.handleFormCancel()} className={styles.cancelBtn}>
           cancel
-        </button>
+        </button>}
       </div>
       <div className={styles.formGroup}>
         <label htmlFor="name">Name</label>

@@ -5,7 +5,13 @@ import { SupabaseClient } from "../../Helper/Supabase";
 import { observer } from "mobx-react";
 import FormStore from "./formstore";
 
-const Leave = () => {
+
+const Leave = ({userId}:any) => {
+  const admin ="4b1ce711-a68a-4571-bf4e-07c2e798cb57"
+  let showAdminPage = false;
+  if(userId === admin){
+   showAdminPage=true;
+  }
   const [datas , setData] = useState<any[]>([]);
   useEffect(
     ()=>{fetchData()},[]
@@ -19,13 +25,12 @@ const Leave = () => {
     setData(data);
   }
  }
- console.log(FormStore.formStatus);
   return (
     <>
-  {!FormStore.formStatus &&<button onClick={()=>FormStore.setFormStatus()}>ADD Leave request</button>  }
-  {FormStore.formStatus &&<ShowForm/> }
-
-  {!FormStore.formStatus && <ShowTable datas={datas}/>}
+  { showAdminPage && !FormStore.formStatus &&<button onClick={()=>FormStore.setFormStatus()}>ADD Leave request</button>  }
+  { showAdminPage && FormStore.formStatus &&<ShowForm  showAdminPage ={showAdminPage}/> }
+  {showAdminPage && !FormStore.formStatus && <ShowTable datas={datas}/>}
+  {!showAdminPage && <ShowForm  showAdminPage ={showAdminPage}/>}
     </>
   )
 }
