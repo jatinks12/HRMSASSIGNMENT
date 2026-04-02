@@ -18,6 +18,7 @@ const Dashboard = () => {
   const [employees, setEmployees] = useState<any[]>([]);
   const [departmentFilter, setDepartmentFilter] = useState("");
   const [roleFilter, setRoleFilter] = useState("");
+  const [statusFilter, setstatusFilter] = useState("");
 
   useEffect(() => {
     getEmployees();
@@ -42,7 +43,7 @@ const Dashboard = () => {
     {
       name: "Pending",
       value: employees.filter(
-        (emp) => emp.Status === true && emp.Pending === true
+        (emp) => emp.Status === true && emp.Pending === true,
       ).length,
     },
   ];
@@ -110,7 +111,6 @@ const Dashboard = () => {
             <th>Name</th>
             <th>Email</th>
 
-           
             <th>
               <select
                 value={departmentFilter}
@@ -129,7 +129,6 @@ const Dashboard = () => {
               </select>
             </th>
 
-           
             <th>
               <select
                 value={roleFilter}
@@ -148,10 +147,17 @@ const Dashboard = () => {
               </select>
             </th>
 
-            <th><select><option value="satus">Status</option>
-            <option value="On leave">On leave</option>
-            <option value="Active">Active</option>
-            </select></th>
+            <th>
+              <select
+                value={statusFilter}
+                onChange={(e) => setstatusFilter(e.target.value)}
+              >
+                <option value="satus">Status</option>
+                <option value="leave">On leave</option>
+                <option value="Active">Active</option>
+                <option value="Pending">Pending</option>
+              </select>
+            </th>
           </tr>
         </thead>
 
@@ -160,7 +166,15 @@ const Dashboard = () => {
             const isMatch =
               (departmentFilter === "" ||
                 emp.department === departmentFilter) &&
-              (roleFilter === "" || emp.role === roleFilter);
+              (roleFilter === "" || emp.role === roleFilter) &&
+              (statusFilter === "" ||
+                (statusFilter === "Active" &&
+                  emp.Status === true &&
+                  !emp.Pending) ||
+                (statusFilter === "leave" &&
+                  emp.Status === false &&
+                  !emp.Pending) ||
+                (statusFilter === "Pending" && emp.Pending === true));
 
             return (
               <tr
@@ -174,7 +188,9 @@ const Dashboard = () => {
                 <td>{emp.Email}</td>
                 <td>{emp.department}</td>
                 <td>{emp.role}</td>
-                <td>{emp.leaves}</td>
+                <td>
+                  {emp.Pending ? "Pending" : emp.Status ? "Active" : "Leave"}
+                </td>
               </tr>
             );
           })}
