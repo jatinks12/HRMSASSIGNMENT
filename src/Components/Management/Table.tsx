@@ -9,11 +9,15 @@ type Employees = {
 
 type Props= {
     employees: Employees[];
-    deleteEmployee:(index:any) => void;
+    deleteEmployee:(Email:string) => void;
     editEmployee:(emp:Employees) =>void;
+    viewEmployee:(emp:Employees) => void;
 };
 
-const EmployeeTable: React.FC<Props> = ({employees,deleteEmployee,editEmployee}) => {
+const EmployeeTable: React.FC<Props> = ({employees,
+    deleteEmployee,
+    editEmployee,
+    viewEmployee }) => {
     return(
         <div>
             <h1>Employee Table</h1>
@@ -37,14 +41,17 @@ const EmployeeTable: React.FC<Props> = ({employees,deleteEmployee,editEmployee})
                     <td>{emp.department}</td>
                     <td>{emp.role}</td>
                     <td>
-                        <button onClick={() =>editEmployee(emp)} >Edit</button>
+                        <button  onClick={() =>editEmployee(emp)} >Edit</button>
 
                         <button onClick={()=>deleteEmployee(emp.Email)}>Delete</button>
+
+                        <button onClick={()=> viewEmployee(emp)}> View</button>
                     </td>
                 </tr>
             ))}
         </tbody>
             </table>
+            
             <><h2>Total Employees : {employees.length}</h2></>
         </div>
         

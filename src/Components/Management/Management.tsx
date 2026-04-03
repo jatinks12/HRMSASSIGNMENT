@@ -122,7 +122,14 @@ const Management = () => {
    setFormdata(emp);
    setEditEmail(emp.Email);
    }
- //Form
+
+   //view function
+   const[viewEmployee,setViewEmployee] = useState<Idata | null>(null);
+   const viewEmployeeDetails = (emp:Idata) =>{
+    setViewEmployee(emp);
+   }
+ 
+   //Form
   return (
     <div className="container">
       <h1>Employees Management</h1>
@@ -173,9 +180,25 @@ const Management = () => {
    <EmployeeTable
    employees={employees}
    deleteEmployee={deleteEmployee} 
-   editEmployee={editEmployee}/>
+   editEmployee={editEmployee}
+   viewEmployee={viewEmployeeDetails}/>
+   
+ {viewEmployee && (
+  <div className="view">
+    <div className="view-modal">
+      <h2>Employee Details</h2>
+
+      <p><b>Name:</b> {viewEmployee.Name}</p>
+      <p><b>Email:</b> {viewEmployee.Email}</p>
+      <p><b>Department:</b> {viewEmployee.department}</p>
+      <p><b>Role:</b> {viewEmployee.role}</p>
+     
+      <button onClick={() => setViewEmployee(null)}>Close</button>
+    </div>
+  </div>
+)}
 </div>
 
-  )
+ )
 }
 export default Management;
