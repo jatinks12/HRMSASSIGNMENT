@@ -2,7 +2,7 @@ import  { useEffect, useState } from "react"
 import EmployeeTable from "./Table";
 import { SupabaseClient } from "../../Helper/Supabase";
 import toast from "react-hot-toast"
- import "./Management.css";
+import "./Management.css";
 interface Idata {
   
   Name: string,
@@ -42,6 +42,7 @@ const Management = () => {
 
     const handleSubmit = async(e:any) =>{
       e.preventDefault(); 
+      //validation
       if(formdata.Name==="" || formdata.Email==="" || formdata.department==="" || formdata.role === ""){
         toast.error("please fill all credentials");
         return;
@@ -70,17 +71,7 @@ const Management = () => {
         }
       }
       //insert data in supabase
-      if(editEmail){
-      const {data,error} = await SupabaseClient.from("Employee").insert([
-        formdata 
-      ]);
-      if (error){
-        console.log("error in updation", error);
-      }else{
-        console.log("success", data);
-        fetchData();
-      }
-    }
+   
     else{
       const {error} = await SupabaseClient
       .from("Employee")
