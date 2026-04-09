@@ -7,9 +7,10 @@ import FormStore from "./formstore";
 
 
 const Leave = ({userId}:any) => {
-  const admin ="4b1ce711-a68a-4571-bf4e-07c2e798cb57"
+  const Admin1 ="f451179d-a36b-476a-8c7d-9c72d844c57d";
+
   let showAdminPage = false;
-  if(userId === admin){
+  if(userId === Admin1){
    showAdminPage=true;
   }
   const [datas , setData] = useState<any[]>([]);
