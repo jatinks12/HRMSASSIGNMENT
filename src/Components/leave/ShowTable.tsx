@@ -1,8 +1,23 @@
+import { useEffect, useState } from "react";
+import { SupabaseClient } from "../../Helper/Supabase";
 
 interface props{
  datas: any[]
 }
-const ShowTable = ({datas}:props) => {
+const ShowTable = () => {
+  
+  useEffect(()=>{
+    fetchData();
+  },[])
+  const [datas , setdatas]=useState<any[]>([]);
+  
+  async function fetchData() {
+    let {data : datas} = await SupabaseClient.from("Employee").select("*");
+   
+    if(datas){
+      setdatas(datas);
+    }
+  }
   
  return (
 
@@ -17,7 +32,7 @@ const ShowTable = ({datas}:props) => {
         </tr>
       </thead>
       <tbody>
-        {datas.map((data)=>(
+        { datas.map((data)=>(
           <tr key={data.id}>
             <td>{data.Name}</td>
             <td>{data.Email}</td>
@@ -31,5 +46,4 @@ const ShowTable = ({datas}:props) => {
   );
 };
 
-
-export default ShowTable
+export default ShowTable;

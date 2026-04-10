@@ -1,33 +1,46 @@
-import {  useEffect, useState } from "react"
-import ShowForm from "./ShowForm";
-import ShowTable from "./ShowTable";
-import { SupabaseClient } from "../../Helper/Supabase";
-import { observer } from "mobx-react";
-import FormStore from "./formstore";
+import { useNavigate } from "react-router-dom";
+import styles from "./leave.module.css";
 
-const Leave = () => {
-  const [datas , setData] = useState<any[]>([]);
-  useEffect(
-    ()=>{fetchData()},[]
-  )
-  async function fetchData(){
-  const {data, error}= await SupabaseClient.from("Employee").select("*");
+interface props{
+  leaveTable: boolean;
+  approveLeave: boolean;
+  applyLeave: boolean
 
-  if(error){
-    alert("unable to load employee data form the table")
-  }else{
-    setData(data);
-  }
- }
- console.log(FormStore.formStatus);
-  return (
-    <>
-  {!FormStore.formStatus &&<button onClick={()=>FormStore.setFormStatus()}>ADD Leave request</button>  }
-  {FormStore.formStatus &&<ShowForm/> }
-
-  {!FormStore.formStatus && <ShowTable datas={datas}/>}
-    </>
-  )
 }
 
-export default observer(Leave)
+const Leave = ({leaveTable,approveLeave,applyLeave}:props) => {
+  const navigate = useNavigate();
+
+  return (
+    <div className={styles.container}>
+      <h2>Leave Management</h2>
+
+      <div className={styles.cardContainer}>
+        
+       { applyLeave &&<div
+          className={styles.card}
+          onClick={() => navigate("/applyleave")}
+        >
+          <h3>Apply Leave</h3>
+        </div>}
+
+       {approveLeave && <div
+          className={styles.card}
+          onClick={() => navigate("/approveleave")}
+        >
+          <h3>Approve Leave</h3>
+        </div>}
+
+     {leaveTable &&   <div
+          className={styles.card}
+          onClick={() => navigate("/leavetable")}
+        >
+          <h3>View Leave Table</h3>
+        </div>}
+
+      </div>
+    </div>
+  );
+};
+
+export default Leave;

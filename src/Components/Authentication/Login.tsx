@@ -3,9 +3,34 @@ import styles from "./Login.module.css";
 import *as Yup from "yup"
 import { SupabaseClient } from "../../Helper/Supabase";
 import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 const Login = () => {
   const navigate= useNavigate();
+
+  // async function checkNavigation( id:string )  {
+  
+  //   const {data: profile}=await SupabaseClient.from("profiles").select("*").eq("id",id).single();
+
+  //   if(!profile){
+  //     toast.error("Profile not found" );
+  //     return;
+  //   }
+    
+  //   const {data : roles} = await SupabaseClient.from("roles").select("*").eq("id",profile.role_id).single();
+
+  //   if(!roles){
+  //     toast.error("Role not found");
+  //   }
+    
+  //  if(roles.can_view_dashboard){
+  //   navigate("/dashboard");
+  //  }else if(roles.can_view_management){
+  //   navigate("/management");
+  //  }else{
+  //   navigate("/leave");
+  //  }
+   
+  // }
   const formik = useFormik({
     initialValues: {
      
@@ -20,15 +45,15 @@ const Login = () => {
       try{
         const{data,error} = await SupabaseClient.auth.signInWithPassword({
           email:values.email,
-          password:values.password
-        });
+          password:values.password,
+        })
         if(error){
           toast.error(error.message);
         }else{
-          console.log("login success: " , data);
-          toast.success("Login successful!")
+          toast.success("Login successful!") 
           setTimeout(()=>{
-            navigate("/dashboard");
+            toast.success("Login successful!");
+            navigate("/");
           },500)
         }
       }catch(err){
@@ -66,6 +91,7 @@ const Login = () => {
         ></input>
          {formik.touched.password && formik.errors.password &&<div className={styles.error}>{formik.errors.password}</div>}
         <button type="submit" className={styles.button}>Submit</button>
+        <p>Don't have Account? <Link to="/signup">SignUp</Link></p>
       </form>
     </div>
   );
