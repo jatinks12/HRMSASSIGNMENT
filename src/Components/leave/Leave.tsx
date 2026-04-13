@@ -4,8 +4,7 @@ import styles from "./leave.module.css";
 interface props{
   leaveTable: boolean;
   approveLeave: boolean;
-  applyLeave: boolean
-
+  applyLeave: boolean;
 }
 
 const Leave = ({leaveTable,approveLeave,applyLeave}:props) => {
@@ -18,7 +17,7 @@ const Leave = ({leaveTable,approveLeave,applyLeave}:props) => {
       <div className={styles.cardContainer}>
         
        { applyLeave &&<div
-          className={styles.card}
+          className={styles.card} 
           onClick={() => navigate("/applyleave")}
         >
           <h3>Apply Leave</h3>

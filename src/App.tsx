@@ -39,101 +39,114 @@ const App = () => {
   const [leaveTable, setLeaveTable] = useState(true);
   const [applyLeave, setApplyLeave] = useState(true);
   const [approveLeave, setApproveLeave] = useState(false);
+  const [userId, setUserId] = useState("");
+  const [deptId, setDeptId] = useState("");
+  const [name, setName]  = useState("");
+  const [email , setEmail] = useState("");
+  async function fetchDetail() {
+    const {
+      data: { user },
+    } = await SupabaseClient.auth.getUser();
+    // console.log("fetchDetail start", user);
+    try {
+      if (!user) {
+        console.log("no user");
+        setIsAuth(false);
+        setLoading(false);
+        return;
+      }
 
- async function fetchDetail() {
-  const{data:{user}}=await SupabaseClient.auth.getUser();
-  console.log("fetchDetail start", user);
-  try {
-    if (!user) {
-      console.log("no user");
-      setIsAuth(false);
+      setIsAuth(true);
+
+      const { data: profile, error: profileError } = await SupabaseClient.from(
+        "profiles",
+      )
+        .select("*")
+        .eq("id", user.id)
+        .single();
+
+      // console.log("profile:", profile, "error:", profileError);
+
+      if (profileError || !profile) {
+        setLoading(false);
+        return;
+      }
+
+      const { data: role, error: roleError } = await SupabaseClient.from(
+        "roles",
+      )
+        .select("*")
+        .eq("id", profile.role_id)
+        .single();
+
+      // console.log("role:", role, "error:", roleError);
+
+      if (roleError || !role) {
+        setLoading(false);
+        return;
+      }
+      setName(profile.full_name);
+      setEmail(profile.Email);
+      setUserId(user.id);
+      setDeptId(profile.department_id);
+      setDashboard(role.can_view_dashboard);
+      setManagement(role.can_view_management);
+      setLeaveTable(role.can_view_leave_table);
+      setApplyLeave(role.can_apply_leave);
+      setApproveLeave(role.can_approve_leave);
       setLoading(false);
-      return;
-    }
-
-    setIsAuth(true);
-
-    const { data: profile, error: profileError } = await SupabaseClient.from("profiles")
-      .select("*")
-      .eq("id", user.id)
-      .single();
-
-    console.log("profile:", profile, "error:", profileError);
-
-    if (profileError || !profile) {
+      // console.log("fetchDetail done");
+    } catch (err) {
+      console.error("fetchDetail catch:", err);
       setLoading(false);
-      return;
     }
-
-    const { data: role, error: roleError } = await SupabaseClient.from("roles")
-      .select("*")
-      .eq("id", profile.role_id)
-      .single();
-
-    console.log("role:", role, "error:", roleError);
-
-    if (roleError || !role) {
-      setLoading(false);
-      return;
-    }
-
-    setDashboard(role.can_view_dashboard);
-    setManagement(role.can_view_management);
-    setLeaveTable(role.can_view_leave_table);
-    setApplyLeave(role.can_apply_leave);
-    setApproveLeave(role.can_approve_leave);
-    setLoading(false);
-    console.log("fetchDetail done");
-  } catch (err) {
-    console.error("fetchDetail catch:", err);
-    setLoading(false);
   }
-}
-const resolvedRef = useRef(false);
+  // const resolvedRef = useRef(false);
 
-useEffect(() => {
-  // async function getSession() {
-  //   console.log("getSession start");
-  //   const { data } = await SupabaseClient.auth.getSession();
-  //   console.log("getSession result:", data.session);
-  //   if (resolvedRef.current) {
-  //     console.log("already resolved, skipping");
-  //     return;
-  //   }
-  //   resolvedRef.current = true;
-  //   if (data.session?.user) {
-  //     await fetchDetail(data.session.user);
-  //   } else {
-  //     setIsAuth(false);
-  //     setLoading(false);
-  //   }
-  // }
+  useEffect(() => {
+    // async function getSession() {
+    //   console.log("getSession start");
+    //   const { data } = await SupabaseClient.auth.getSession();
+    //   console.log("getSession result:", data.session);
+    //   if (resolvedRef.current) {
+    //     console.log("already resolved, skipping");
+    //     return;
+    //   }
+    //   resolvedRef.current = true;
+    //   if (data.session?.user) {
+    //     await fetchDetail(data.session.user);
+    //   } else {
+    //     setIsAuth(false);
+    //     setLoading(false);
+    //   }
+    // }
 
-  // getSession();
+    // getSession();
 
-  // const { data: listener } = SupabaseClient.auth.onAuthStateChange(
-  //   async (event, session) => {
-  //     console.log("AUTH EVENT:", event, session);
-  //     resolvedRef.current = true;
-  //     if (session?.user) {
-  //       await fetchDetail(session.user);
-  //     } else {
-  //       setIsAuth(false);
-  //       setDashboard(false);
-  //       setManagement(false);
-  //       setLeaveTable(false);
-  //       setApplyLeave(false);
-  //       setApproveLeave(false);
-  //       setLoading(false);
-  //     }
-  //   },
-  // );
+    // const { data: listener } = SupabaseClient.auth.onAuthStateChange(
+    //   async (event, session) => {
+    //     console.log("AUTH EVENT:", event, session);
+    //     resolvedRef.current = true;
+    //     if (session?.user) {
+    //       await fetchDetail(session.user);
+    //     } else {
+    //       setIsAuth(false);
+    //       setDashboard(false);
+    //       setManagement(false);
+    //       setLeaveTable(false);
+    //       setApplyLeave(false);
+    //       setApproveLeave(false);
+    //       setLoading(false);
+    //     }
+    //   },
+    // );
 
-  // return () => {
-  //   listener.subscription.unsubscribe();
-  // };
-  fetchDetail()
-}, [location.pathname]);
+    // return () => {
+    //   listener.subscription.unsubscribe();
+    // };
+   
+    fetchDetail();
+  }, [location.pathname]);
 
   return (
     <>
@@ -148,14 +161,14 @@ useEffect(() => {
           <button
             style={{ backgroundColor: "red" }}
             onClick={async () => {
-              console.log("inside this")
-            const{error} = await SupabaseClient.auth.signOut();
-            if(error){
-              console.log(error)
-            }else{
-              console.log("no error");
-              navigate("/login");
-            }
+            
+              const { error } = await SupabaseClient.auth.signOut();
+              if (error) {
+                console.log(error);
+              } else {
+             
+                navigate("/login");
+              }
             }}
           >
             Logout
@@ -180,14 +193,11 @@ useEffect(() => {
                 <Navigate to="/leave" />
               )
             ) : (
-              
               <Navigate to="/login" />
-              
             )
           }
         />
 
-        {/* PUBLIC ROUTES */}
         <Route
           path="/login"
           element={
@@ -216,7 +226,7 @@ useEffect(() => {
           }
         />
 
-        {/* PROTECTED ROUTES */}
+       
         <Route
           path="/dashboard"
           element={
@@ -251,7 +261,7 @@ useEffect(() => {
               loading={loading}
               allowed={applyLeave}
             >
-              <ShowForm />
+              <ShowForm userId={userId} deptId={deptId} name={name} email={email} />
             </ProtectedRoute>
           }
         />
@@ -264,7 +274,7 @@ useEffect(() => {
               loading={loading}
               allowed={approveLeave}
             >
-              <ApproveLeave />
+              <ApproveLeave   email={email}/>
             </ProtectedRoute>
           }
         />
@@ -277,7 +287,7 @@ useEffect(() => {
               loading={loading}
               allowed={leaveTable}
             >
-              <ShowTable />
+              <ShowTable email={email}/>
             </ProtectedRoute>
           }
         />

@@ -1,255 +1,203 @@
 import { useFormik } from "formik";
 
 import { observer } from "mobx-react-lite";
-import FormStore from "./formstore";
 import styles from "./ShowForm.module.css";
 import * as Yup from "yup";
 import { SupabaseClient } from "../../Helper/Supabase";
 import toast from "react-hot-toast";
-import { useState } from "react";
+import { Navigate, useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
-const ShowForm = ({ showAdminPage }: any) => {
-  const [showDetail, setShowDetail] = useState(false);
-  const [employeeData, setEmployeeData] = useState<any[]>([]);
+interface props {
+  userId: string;
+  deptId: string;
+  name: string;
+  email: string;
+}
+
+const ShowForm = ({ userId, deptId, name, email }: props) => {
+  const navigate = useNavigate();
+
+  const calculateWorkingDays  = (start : string , end:string) =>{
+    if(!start||!end)return"";
+
+    let count =0;
+    let current = new Date(start);
+    const last  = new Date(end);
+
+    while(current <= last){
+      const day = current.getDay();
+
+      if(day !== 0 && day!== 6){
+        count++;
+      }
+      current.setDate(current.getDate()+1);
+    }
+    return count.toString();
+  }
+
+ 
   const formik = useFormik({
     initialValues: {
-      name: "",
-      Email: "",
-      role: "",
-      department: "",
       startDate: "",
       endDate: "",
+      total_day: "",
       reason: "",
+      leave_type: "",
     },
     validationSchema: Yup.object({
-      name: Yup.string().required("Name is required"),
-      Email: Yup.string().email("Invalid format(example = test@gmail.com)"),
-      role: Yup.string().required("role is required"),
-      department: Yup.string().required("department is required"),
-      startDate: Yup.string().required("Start Date is required"),
-      endDate: Yup.string().required("End Date is required"),
-      reason: Yup.string().required("Reason is requried"),
+      startDate: Yup.date().required("Start Date is required").min(new Date(),"Start date must be in the future"),
+      endDate: Yup.date()
+        .required("End Date is required")
+        .test(
+          "is-after-start",
+          "End date must be after start date",
+          function (value) {
+            const { startDate } = this.parent;
+            return value && startDate
+              ? new Date(value) > new Date(startDate)
+              : true;
+          },
+        ),
+      total_day: Yup.string().required("Total days is required"),
+      leave_type: Yup.string().required("Leave type is required"),
+      reason: Yup.string().required("Reason is required"),
     }),
     onSubmit: async (values) => {
-      console.log(values);
-      const { data, error } = await SupabaseClient.from("Employee").select("*");
-      let file = [];
+      // console.log(values);
+
+      const { data, error } = await SupabaseClient.from("leave_types")
+        .select("*")
+        .eq("name", values.leave_type)
+        .maybeSingle();
       if (data) {
-        file = data.filter(
-          (item) =>
-            values.name.toUpperCase() === item.Name &&
-            values.Email.toUpperCase() === item.Email &&
-            values.department === item.department &&
-            values.role === item.role,
-        );
+        // console.log("data" ,data , values.leave_type );
+      } else {
+        console.log("error", error);
       }
-      if (file.length > 0) {
-        const { error } = await SupabaseClient.from("Employee")
-          .update({
-            Reason: values.reason,
-            startDate: values.startDate,
-            EndDate: values.endDate,
-            Pending: true,
-          })
-          .eq("id", file[0].id);
-        if (!error) {
-          toast.success("leave is applied");
-        }
-        const { data } = await SupabaseClient.from("Employee")
-          .select("*")
-          .eq("id", file[0].id);
-        if (data) {
-          setEmployeeData(data);
-          setShowDetail(true);
-        }
-      } else if(data) {
-        toast.error("Invalid Employee credentials ");
-        (data.filter(
-          (item) =>console.log(values.name.toUpperCase() === item.Name ,
-            values.Email.toUpperCase() === item.Email ,
-            values.department === item.department ,
-            values.role === item.role, )
-            
-        ))
+      const { error: err } = await SupabaseClient.from("leave_requests").insert(
+        [
+          {
+            user_id: userId,
+            Name: name,
+            Email: email,
+            leave_type_id: data.id,
+            department_id: deptId,
+            start_date: values.startDate,
+            end_date: values.endDate,
+            total_days: values.total_day,
+            reason: values.reason,
+            status: "Pending",
+          },
+        ],
+      );
+      if (err) {
+        console.log("err", err);
+      } else {
+        toast.success("leave applied");
+        navigate("/leavetable");
       }
       formik.resetForm();
     },
   });
 
+    useEffect (()=>{
+    const {startDate , endDate}  = formik.values;
+    if(startDate && endDate){
+      const days = calculateWorkingDays(startDate , endDate);
+      formik.setFieldValue("total_day",days);
+    }
+   },[formik.values.startDate , formik.values.endDate]);
+
   return (
     <>
       <form onSubmit={formik.handleSubmit} className={styles.form}>
         <div className={styles.header}>
-          <span>Personal information </span>
-          {showAdminPage && (
-            <button
-              type="button"
-              onClick={() => FormStore.handleFormCancel()}
-              className={styles.cancelBtn}
+          <span>Leave Application</span>
+        </div>
+
+        <div className={styles.formGrid}>
+          <div className={styles.inputGroup}>
+            <label>Start Date</label>
+            <input
+              type="datetime-local"
+              name="startDate"
+              value={formik.values.startDate}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+            />
+            {formik.touched.startDate && formik.errors.startDate && (
+              <span className={styles.error}>{formik.errors.startDate}</span>
+            )}
+          </div>
+
+          <div className={styles.inputGroup}>
+            <label>End Date</label>
+            <input
+              type="datetime-local"
+              name="endDate"
+              value={formik.values.endDate}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+            />
+            {formik.touched.endDate && formik.errors.endDate && (
+              <span className={styles.error}>{formik.errors.endDate}</span>
+            )}
+          </div>
+
+          <div className={styles.inputGroup}>
+            <label>Total Days</label>
+            <input
+              type="text"
+              name="total_day"
+              value={formik.values.total_day}
+              readOnly
+            />
+            {formik.touched.total_day && formik.errors.total_day && (
+              <span className={styles.error}>{formik.errors.total_day}</span>
+            )}
+          </div>
+
+          <div className={styles.inputGroup}>
+            <label>Leave Type</label>
+            <select
+              name="leave_type"
+              value={formik.values.leave_type}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
             >
-              cancel
-            </button>
-          )}
+              <option value="">Select leave type</option>
+              <option value="Maternity Leave">Maternity Leave</option>
+              <option value="Earned Leave">Earned Leave</option>
+              <option value="Casual Leave">Casual Leave</option>
+              <option value="Sick Leave">Sick Leave</option>
+              <option value="Unpaid Leave">Unpaid Leave</option>
+            </select>
+
+            {formik.touched.leave_type && formik.errors.leave_type && (
+              <span className={styles.error}>{formik.errors.leave_type}</span>
+            )}
+          </div>
+
+          <div className={styles.inputGroupFull}>
+            <label>Reason</label>
+            <textarea
+              name="reason"
+              placeholder="Enter your reason..."
+              value={formik.values.reason}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+            />
+            {formik.touched.reason && formik.errors.reason && (
+              <span className={styles.error}>{formik.errors.reason}</span>
+            )}
+          </div>
         </div>
 
-        <div className={styles.formGroup}>
-          <label htmlFor="">Name</label>
-          <input
-            id="name"
-            name="name"
-            type="text"
-            placeholder="Enter the name"
-            value={formik.values.name}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-          ></input>
-          {formik.touched.name && formik.errors.name && (
-            <div className={styles.error}>{formik.errors.name}</div>
-          )}
-
-          <label htmlFor="Email">Email</label>
-          <input
-            id="Email"
-            name="Email"
-            type="Email"
-            placeholder="Enter the Email"
-            value={formik.values.Email}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-          ></input>
-          {formik.touched.Email && formik.errors.Email && (
-            <div className={styles.error}>{formik.errors.Email}</div>
-          )}
-
-          <label htmlFor="department">Enter Your Department</label>
-
-          <select
-            id="department"
-            name="department"
-            value={formik.values.department}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-          >
-            <option value="">Select department</option>
-            <option value="techOps">techOps</option>
-            <option value="NetInfa">NetInfa</option>
-            <option value="AppDev">AppDev</option>
-            <option value="DevOps">DevOps</option>
-            <option value="CloudSVc">CloudSVc</option>
-            <option value="ITStrac">ITStrac</option>
-            <option value="DigSol">DigSol</option>
-            <option value="CSE">CSE</option>
-            <option value="DataLab">DataLab</option>
-          </select>
-
-          {formik.touched.department && formik.errors.department && (
-            <div className={styles.error}>{formik.errors.department}</div>
-          )}
-
-          <label htmlFor="role">Enter your Role</label>
-
-          <select
-            id="role"
-            name="role"
-            value={formik.values.role}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-          >
-            <option value="">Select role</option>
-            <option value="Software Developer">Software Developer</option>
-            <option value="Full Stack">Full Stack</option>
-            <option value="DevOps">DevOps</option>
-            <option value="Project Manager">Project Manager</option>
-            <option value="Technical supporter">Technical suppoter</option>
-            <option value="Business analyst">Business analyst</option>
-            <option value="Frontend developer">Frontend developer</option>
-            <option value="UI designer">UI designer</option>
-          </select>
-
-          {formik.touched.role && formik.errors.role && (
-            <div className={styles.error}>{formik.errors.role}</div>
-          )}
-
-          <label htmlFor="startDate">startDate</label>
-          <input
-            id="startDate"
-            name="startDate"
-            type="datetime-local"
-            value={formik.values.startDate}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-          ></input>
-          {formik.touched.startDate && formik.errors.startDate && (
-            <div className={styles.error}>{formik.errors.startDate}</div>
-          )}
-          <label htmlFor="endDate">endDate</label>
-          <input
-            id="endDate"
-            name="endDate"
-            type="datetime-local"
-            value={formik.values.endDate}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-          ></input>
-          {formik.touched.endDate && formik.errors.endDate && (
-            <div className={styles.error}>{formik.errors.endDate}</div>
-          )}
-          <label htmlFor="reason">reason</label>
-          <input
-            id="reason"
-            name="reason"
-            type="text"
-            placeholder="Enter your reason"
-            value={formik.values.reason}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-          ></input>
-          {formik.touched.reason && formik.errors.reason && (
-            <div className={styles.error}>{formik.errors.reason}</div>
-          )}
-          <button type="submit" className={styles.submitBtn}>
-            Submit
-          </button>
-        </div>
+        <button type="submit" className={styles.submitBtn}>
+          Apply Leave
+        </button>
       </form>
-      {showDetail && employeeData.length > 0 && (
-        <div className={styles.resultBox}>
-          <h3>Employee Details</h3>
-
-          {employeeData.map((emp) => (
-            <div key={emp.id} className={styles.card}>
-              <p>
-                <strong>Name:</strong> {emp.Name}
-              </p>
-              <p>
-                <strong>Email:</strong> {emp.Email}
-              </p>
-              <p>
-                <strong>Department:</strong> {emp.department}
-              </p>
-              <p>
-                <strong>Role:</strong> {emp.role}
-              </p>
-              <p>
-                <strong>Reason:</strong> {emp.Reason}
-              </p>
-              <p>
-                <strong>Start Date:</strong>{" "}
-                {new Date(emp.startDate).toLocaleDateString()}{" "}
-                {new Date(emp.startDate).toLocaleTimeString()}
-              </p>
-              <p>
-                <strong>End Date:</strong>{" "}
-                {new Date(emp.EndDate).toLocaleDateString()}{" "}
-                {new Date(emp.EndDate).toLocaleTimeString()}
-              </p>
-              <p>
-                <strong>Status:</strong> {emp.Pending ? "Pending" : "Approved"}
-              </p>
-            </div>
-          ))}
-        </div>
-      )}
     </>
   );
 };

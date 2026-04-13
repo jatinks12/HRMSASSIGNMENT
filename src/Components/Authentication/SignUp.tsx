@@ -91,15 +91,6 @@ const SignUp = () => {
               toast.error("Profile creation failed");
               return;
             }
-
-        
-
-        await SupabaseClient.from("leave_requests").insert([
-          {
-            user_id: profileData.id,
-            department_id: deptData.id,
-          },
-        ]);
         toast.success("Signup successful!");
           navigate("/login");
      

@@ -33,7 +33,6 @@ const Login = () => {
   // }
   const formik = useFormik({
     initialValues: {
-     
       email: "",
       password:"",
     },
@@ -50,7 +49,6 @@ const Login = () => {
         if(error){
           toast.error(error.message);
         }else{
-          toast.success("Login successful!") 
           setTimeout(()=>{
             toast.success("Login successful!");
             navigate("/");
