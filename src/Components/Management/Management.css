@@ -156,7 +156,7 @@ button:last-child:hover{
   background-color: #4CAF50;
   color: white;
   border-radius: 5px;
-  margin: 0 3px;
+  /* margin: 0 3px; */
 }
 
 /* Previous (<) and Next (>) buttons */

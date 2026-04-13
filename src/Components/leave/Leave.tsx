@@ -7,7 +7,7 @@ import FormStore from "./formstore";
 
 
 const Leave = ({userId}:any) => {
-  const admin ="4b1ce711-a68a-4571-bf4e-07c2e798cb57"
+  const admin ="edfa774c-cf13-465a-a8d0-7091ef68626c"
   let showAdminPage = false;
   if(userId === admin){
    showAdminPage=true;

@@ -21,17 +21,63 @@ const Management = () => {
 
   //Getting data from supabase
   const [employees,setEmployee] = useState<any[]>([]);
+  const[page,setPage] = useState(1);
+  const[limit,setlimit] =useState(5);
+  const [totalRecords,setTotalRecords]= useState(0);
 
-  async function  fetchData() {
-    const {data,error} =await SupabaseClient.from("Employee").select("*");
-    if(data){
-      setEmployee(data);
-    }else{
-       console.log("error occured", error);
-    }
+// const [search, setSearch] = useState("");
+const [sortField, setSortField] = useState<string | null>(null);
+const [sortOrder, setSortOrder] = useState<1 | -1 | null>(null);
+const [filters, setFilters] = useState<any>({});
+ 
+
+  const fetchData = async (page: number, limit: number) => {    //Fetch Data
+  const from = (page - 1) * limit;
+  const to = from + limit - 1;
+
+  let query = SupabaseClient  
+  .from("HRMS")
+  .select("*",{count:"exact"});
+ 
+  
+if (filters.Name?.value) {
+  query = query.ilike("Name", `%${filters.Name.value}%`);
+}
+
+if (filters.Email?.value) {
+  query = query.ilike("Email", `%${filters.Email.value}%`);
+}
+
+if (filters.department?.value) {
+  query = query.ilike("department", `%${filters.department.value}%`);
+}
+
+if (filters.role?.value) {
+  query = query.ilike("role", `%${filters.role.value}%`);
+}
+
+  // SORT
+
+if (sortField && sortOrder !== null) {
+  query = query.order(sortField, {
+    ascending: sortOrder === 1,
+  });
+}
+  const { data, error, count } = await query.range(from, to);
+
+  if (error) {
+    console.log(error);
+  } else {
+    // employees(data);
+    setEmployee(data);
+   setTotalRecords(count || 0); 
   }
-  useEffect(()=>{fetchData()},[])
+};
+useEffect(() => {
+  fetchData(page,limit); 
+}, [page,limit,sortField ,sortOrder,filters]);
 
+// form input
   const handleChange = (e:any)=> {
       const {name, value} = e.target;
 
@@ -48,7 +94,6 @@ const Management = () => {
         return;
       }
 
-
        const formattedData = {
     ...formdata,
     Name: formdata.Name.toUpperCase(),
@@ -58,15 +103,15 @@ const Management = () => {
       //Update data 
       if(editEmail){
         const {error} = await SupabaseClient 
-        .from ("Employee")
+        .from ("HRMS")
         .update(formattedData)
         .eq("Email", editEmail);
 
         if(error){
-          console.log("error occur")}
+          console.log("error occur",error.message)}
         else{
           toast.success("Employee Updated");
-          fetchData();
+          fetchData(1,5);
           setEditEmail(null);
         }
       }
@@ -74,17 +119,16 @@ const Management = () => {
    
     else{
       const {error} = await SupabaseClient
-      .from("Employee")
+      .from("HRMS")
       .insert([formattedData]);
       if(error){
-        console.log("Error occur");
+        console.log("Error occur",error.message);
       }
       else{
         toast.success("New Employee Added");
-        fetchData()
+        fetchData(1,5)
       }
     }
-    //delete function
       setFormdata({ 
         Name:"",
         Email:"",
@@ -92,19 +136,19 @@ const Management = () => {
         department:"",
       });
     };
+     //delete function
    const deleteEmployee = async (email: string) => {
 
   const { error } = await SupabaseClient
-    .from("Employee")
+    .from("HRMS")
     .delete()
     .eq("Email", email);
 
   if (error) {
     console.log("Delete error:", error);
   } else {
-    console.log("Employee deleted");
     toast.success(" Employee Deleted");
-    fetchData();
+    fetchData(1,5);
   }
 };
 // Edit function
@@ -134,8 +178,9 @@ const Management = () => {
     <label>Enter Your Mail id. </label>
     <input type="email" name = "Email" placeholder="enter email"
     onChange={handleChange} value={formdata.Email} required/>
-    <br/>
+
     <label>Enter Your Department </label>
+    <br/>
     <select  name = "department" 
     onChange={handleChange} value={formdata.department} required> 
     <option value=""> Select department </option>
@@ -149,10 +194,11 @@ const Management = () => {
     <option value = "CSE">CSE</option>
     <option value = "DataLab">DataLab</option>
     </select>
-<br/>
+
     <label>Enter your Role </label>
+    <br/>
     <select name="role" 
-    onChange={handleChange} value={formdata.role} required> <br/><br/>
+    onChange={handleChange} value={formdata.role} required> 
   <option value =""> Select role </option>
   <option value = "Software Developer">Software Developer</option>
   <option value = "Full Stack">Full Stack</option>
@@ -167,12 +213,28 @@ const Management = () => {
     <button type="submit" >Submit</button>
 
    </form>
+   
  
    <EmployeeTable
    employees={employees}
    deleteEmployee={deleteEmployee} 
    editEmployee={editEmployee}
-   viewEmployee={viewEmployeeDetails}/>
+   viewEmployee={viewEmployeeDetails}
+     totalRecords={totalRecords}
+    onPageChange={(newPage, newLimit) => {
+    setPage(newPage);
+    setlimit(newLimit);   
+  }}
+  limit={limit} 
+   
+  onSortChange = {(field,order) => {
+   
+    setSortField(field);
+    setSortOrder(order);
+  }}
+  onFilterChange={(f) => setFilters(f)}
+  
+  />
    
  {viewEmployee && (
   <div className="view">
